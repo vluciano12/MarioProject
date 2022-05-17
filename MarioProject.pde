@@ -1,6 +1,7 @@
 final static float MOVE_SPEED = 5;
 final static float SPRITE_SCALE = 55.0 / 128;
 final static float SPRITE_SIZE = 55;
+final static float GRAVITY = .6;
 
 Sprite p;
 PImage grass, crate, greenBrick;
@@ -22,10 +23,36 @@ void setup(){
 void draw(){
   background(255);
   p.display();
-  p.update();
+  resolvePlatCollisions(p, platforms);
   
   for(Sprite s : platforms)
     s.display();
+}
+
+void resolvePlatCollisions(Sprite s, ArrayList<Sprite> walls){
+  s.changeY += GRAVITY;
+  
+  //vertical
+  s.centerY += s.changeY;
+  ArrayList<Sprite> colList = checkCollisionList(s, walls);
+  if(colList.size() > 0){
+    Sprite collided = colList.get(0);
+    if(s.changeY > 0){ s.setBottom(collided.getTop()); }
+    else if(s.changeY < 0){ s.setTop(collided.getBottom()); }
+    
+    s.changeY = 0;
+  }
+  
+  //horizontal
+  s.centerX += s.changeX;
+  colList = checkCollisionList(s, walls);
+  if(colList.size() > 0){
+    Sprite collided = colList.get(0);
+    if(s.changeX > 0){ s.setRight(collided.getLeft()); }
+    else if(s.changeX < 0){ s.setLeft(collided.getRight()); }
+    
+    s.changeX = 0;
+  }
 }
 
 boolean checkCollision(Sprite s1, Sprite s2){
