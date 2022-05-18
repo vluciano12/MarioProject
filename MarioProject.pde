@@ -4,9 +4,16 @@ final static float SPRITE_SIZE = 55;
 final static float GRAVITY = .6;
 final static float JUMP_SPEED = 14;
 
+final static float RIGHT_MARGIN = 400;
+final static float LEFT_MARGIN = 60;
+final static float VERTICAL_MARGIN = 40;
+
 Sprite p;
 PImage grass, crate, greenBrick;
 ArrayList<Sprite> platforms;
+
+float viewX = 0;
+float viewY = 0;
 
 void setup(){
   size(800,600);
@@ -30,7 +37,18 @@ void draw(){
     s.display();
 }
 
-public boolean isOnPlatforms(Sprite s, ArrayList<Sprite> walls){
+void scroll(){
+  float rBoundary = viewX + width - RIGHT_MARGIN;
+  if(p.getRight() > rBoundary) viewX += p.getRight() - rBoundary;
+  
+  float lBoundary = viewX + LEFT_MARGIN;
+  if(p.getLeft() < lBoundary) viewX -= lBoundary - p.getLeft();
+  
+  float bBoundary = viewY + VERTICAL_MARGIN;
+  if(p.getBottom() > bBoundary) viewY += p.getBottom() - bBoundary;
+}
+
+boolean isOnPlatforms(Sprite s, ArrayList<Sprite> walls){
   s.centerY += 5;
   ArrayList<Sprite> colList = checkCollisionList(s, walls);
   s.centerY -= 5;
