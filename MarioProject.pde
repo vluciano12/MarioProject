@@ -2,6 +2,7 @@ final static float MOVE_SPEED = 5;
 final static float SPRITE_SCALE = 55.0 / 128;
 final static float SPRITE_SIZE = 55;
 final static float GRAVITY = .6;
+final static float JUMP_SPEED = 14;
 
 Sprite p;
 PImage grass, crate, greenBrick;
@@ -27,6 +28,14 @@ void draw(){
   
   for(Sprite s : platforms)
     s.display();
+}
+
+public boolean isOnPlatforms(Sprite s, ArrayList<Sprite> walls){
+  s.centerY += 5;
+  ArrayList<Sprite> colList = checkCollisionList(s, walls);
+  s.centerY -= 5;
+  if(colList.size() > 0){ return true; } 
+  else { return false;  }
 }
 
 void resolvePlatCollisions(Sprite s, ArrayList<Sprite> walls){
@@ -75,14 +84,14 @@ ArrayList<Sprite> checkCollisionList(Sprite s, ArrayList<Sprite> list){
 
 void keyPressed(){
   if(keyCode == RIGHT){p.changeX = MOVE_SPEED;}
-  if(keyCode == LEFT){p.changeX = -MOVE_SPEED;}
-  if(keyCode == UP){p.changeY = -MOVE_SPEED;}
-  if(keyCode == DOWN){p.changeY = MOVE_SPEED;}
+  else if(keyCode == LEFT){p.changeX = -MOVE_SPEED;}
+  else if(keyCode == UP && isOnPlatforms(p, platforms)){p.changeY = -JUMP_SPEED;}
+  
 }
 
 void keyReleased(){
   if(keyCode == RIGHT || keyCode == LEFT){p.changeX = 0;}
-  if(keyCode == UP || keyCode == DOWN){p.changeY = 0;}
+  if(keyCode == UP){p.changeY = 0;}
 }
 
 void createPlatforms(String filename){
