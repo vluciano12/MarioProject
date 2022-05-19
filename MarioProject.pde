@@ -8,6 +8,10 @@ final static float RIGHT_MARGIN = 400;
 final static float LEFT_MARGIN = 60;
 final static float VERTICAL_MARGIN = 40;
 
+final static int NEUTRAL_FACING = 0;
+final static int RIGHT_FACING = 1;
+final static int LEFT_FACING = 2;
+
 Sprite p;
 PImage grass, crate, greenBrick;
 ArrayList<Sprite> platforms;
@@ -30,6 +34,7 @@ void setup(){
 
 void draw(){
   background(255);
+  scroll();
   p.display();
   resolvePlatCollisions(p, platforms);
   
@@ -44,8 +49,13 @@ void scroll(){
   float lBoundary = viewX + LEFT_MARGIN;
   if(p.getLeft() < lBoundary) viewX -= lBoundary - p.getLeft();
   
-  float bBoundary = viewY + VERTICAL_MARGIN;
+  float bBoundary = viewY + height - VERTICAL_MARGIN;
   if(p.getBottom() > bBoundary) viewY += p.getBottom() - bBoundary;
+  
+  float tBoundary = viewY + VERTICAL_MARGIN;
+  if(p.getTop() < tBoundary) viewY -= tBoundary - p.getTop();
+  
+  translate(-viewX, -viewY);
 }
 
 boolean isOnPlatforms(Sprite s, ArrayList<Sprite> walls){
