@@ -35,6 +35,9 @@ public class AnimatedSprite extends Sprite{
     else{ currentImgs = standNeutral; }
   }
   
-  void advToNextImg(){}
-  
+  void advToNextImg(){
+    index++;
+    if(index == currentImgs.length) index = 0;
+    image = currentImgs[index];
+  }
 }

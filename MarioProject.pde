@@ -13,8 +13,9 @@ final static int RIGHT_FACING = 1;
 final static int LEFT_FACING = 2;
 
 Sprite p;
-PImage grass, crate, greenBrick;
+PImage grass, crate, greenBrick, coin;
 ArrayList<Sprite> platforms;
+ArrayList<Sprite> coins;
 
 float viewX = 0;
 float viewY = 0;
@@ -27,8 +28,10 @@ void setup(){
   p.changeY = 0;
   
   platforms = new ArrayList<Sprite>();
+  coins = new ArrayList<Sprite>();
   grass = loadImage("grass.png");
   greenBrick = loadImage("brick.png");
+  coin = loadImage("coin_0.png");
   createPlatforms("map.csv");
 }
 
@@ -40,6 +43,11 @@ void draw(){
   
   for(Sprite s : platforms)
     s.display();
+    
+  for(Sprite c : coins){
+    c.display();
+    ((AnimatedSprite)c).updateAnimation();
+  }
 }
 
 void scroll(){
@@ -137,6 +145,11 @@ void createPlatforms(String filename){
         s.centerX = SPRITE_SIZE/2 + col * SPRITE_SIZE;
         s.centerY = SPRITE_SIZE/2 + row * SPRITE_SIZE;
         platforms.add(s);
+      } else if(values[col].equals("3")){
+        Coin c = new Coin(coin, SPRITE_SCALE);
+        c.centerX = SPRITE_SIZE/2 + col * SPRITE_SIZE;
+        c.centerY = SPRITE_SIZE/2 + row * SPRITE_SIZE;
+        coins.add(c);
       }
     }
   }
