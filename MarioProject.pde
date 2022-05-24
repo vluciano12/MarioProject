@@ -12,10 +12,15 @@ final static int NEUTRAL_FACING = 0;
 final static int RIGHT_FACING = 1;
 final static int LEFT_FACING = 2;
 
+final static float WIDTH = SPRITE_SIZE * 16;
+final static float HEIGHT = SPRITE_SIZE * 12;
+final static float GROUND_LEVEL = HEIGHT - SPRITE_SIZE;
+
 Sprite p;
-PImage grass, crate, greenBrick, coin;
+PImage grass, crate, greenBrick, coin, spider;
 ArrayList<Sprite> platforms;
 ArrayList<Sprite> coins;
+Enemy enemy;
 
 float viewX = 0;
 float viewY = 0;
@@ -32,6 +37,7 @@ void setup(){
   grass = loadImage("grass.png");
   greenBrick = loadImage("brick.png");
   coin = loadImage("coin_0.png");
+  spider = loadImage("spider0.png");
   createPlatforms("map.csv");
 }
 
@@ -48,6 +54,10 @@ void draw(){
     c.display();
     ((AnimatedSprite)c).updateAnimation();
   }
+  
+  enemy.display();
+  enemy.update();
+  enemy.updateAnimation();
 }
 
 void scroll(){
@@ -150,6 +160,12 @@ void createPlatforms(String filename){
         c.centerX = SPRITE_SIZE/2 + col * SPRITE_SIZE;
         c.centerY = SPRITE_SIZE/2 + row * SPRITE_SIZE;
         coins.add(c);
+      } else if(values[col].equals("4")){
+        float bL = col * SPRITE_SIZE;
+        float bR = bL + 4 * SPRITE_SIZE;
+        enemy = new Enemy(spider, 50/72.0, bL, bR);
+        enemy.centerX = SPRITE_SIZE/2 + col * SPRITE_SIZE;
+        enemy.centerY = SPRITE_SIZE/2 + row * SPRITE_SIZE;
       }
     }
   }
