@@ -57,7 +57,7 @@ void draw(){
   
   enemy.display();
   enemy.update();
-  enemy.updateAnimation();
+  //enemy.updateAnimation();
 }
 
 void scroll(){
