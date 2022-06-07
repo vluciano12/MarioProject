@@ -16,24 +16,31 @@ final static float WIDTH = SPRITE_SIZE * 16;
 final static float HEIGHT = SPRITE_SIZE * 12;
 final static float GROUND_LEVEL = HEIGHT - SPRITE_SIZE;
 
-Sprite p;
-PImage grass, crate, greenBrick, coin, spider;
+
+Player player;
+PImage grass, crate, greenBrick, coin, spider, p;
 ArrayList<Sprite> platforms;
 ArrayList<Sprite> coins;
 Enemy enemy;
 
+boolean isGameOver;
+int numCoins;
 float viewX = 0;
 float viewY = 0;
 
 void setup(){
   size(800,600);
   imageMode(CENTER);
-  p = new Sprite("Capture.PNG", 0.5, 100, 300);
-  p.changeX = 0;
-  p.changeY = 0;
+  p = loadImage("pStandR.png");
+  player = new Player(p, 0.5);
+  player.setBottom(GROUND_LEVEL);
+  player.centerX = 100;
   
+  isGameOver = false;
+  numCoins = 0;
   platforms = new ArrayList<Sprite>();
   coins = new ArrayList<Sprite>();
+  
   grass = loadImage("grass.png");
   greenBrick = loadImage("brick.png");
   coin = loadImage("coin_0.png");
@@ -42,11 +49,19 @@ void setup(){
 }
 
 void draw(){
-  background(255);
   scroll();
-  p.display();
-  resolvePlatCollisions(p, platforms);
   
+  displayAll();
+  
+  player.updateAnimation();
+  resolvePlatCollisions(player, platforms);
+  enemy.update();
+  enemy.updateAnimation();
+  //collectCoins();
+  //checkDeath();
+}
+
+void displayAll(){
   for(Sprite s : platforms)
     s.display();
     
@@ -54,24 +69,36 @@ void draw(){
     c.display();
     ((AnimatedSprite)c).updateAnimation();
   }
-  
+  player.display();
   enemy.display();
-  enemy.update();
-  //enemy.updateAnimation();
+  
+  background(255);
+  textSize(32);
+  text("Coin:" + numCoins, viewX + 50, viewY + 50);
+  text("Lives:" + player.lives, viewX + 50, viewY + 100);
+  if(isGameOver){
+    fill(0,0,255);
+    text("GAME OVER!", viewX + width/2 - 100, viewY + height/2);
+    if(player.lives == 0)
+      text("You lose!", viewX + width/2 - 100, viewY + height/2 + 50);
+    else
+      text("You win!", viewX + width/2 - 100, viewY + height/2 + 100);
+    text("Press SPACE to restart!", viewX + width/2 - 100, viewY + height/2 + 100);
+  }
 }
 
 void scroll(){
   float rBoundary = viewX + width - RIGHT_MARGIN;
-  if(p.getRight() > rBoundary) viewX += p.getRight() - rBoundary;
+  if(player.getRight() > rBoundary) viewX += player.getRight() - rBoundary;
   
   float lBoundary = viewX + LEFT_MARGIN;
-  if(p.getLeft() < lBoundary) viewX -= lBoundary - p.getLeft();
+  if(player.getLeft() < lBoundary) viewX -= lBoundary - player.getLeft();
   
   float bBoundary = viewY + height - VERTICAL_MARGIN;
-  if(p.getBottom() > bBoundary) viewY += p.getBottom() - bBoundary;
+  if(player.getBottom() > bBoundary) viewY += player.getBottom() - bBoundary;
   
   float tBoundary = viewY + VERTICAL_MARGIN;
-  if(p.getTop() < tBoundary) viewY -= tBoundary - p.getTop();
+  if(player.getTop() < tBoundary) viewY -= tBoundary - player.getTop();
   
   translate(-viewX, -viewY);
 }
@@ -129,15 +156,15 @@ ArrayList<Sprite> checkCollisionList(Sprite s, ArrayList<Sprite> list){
 
 
 void keyPressed(){
-  if(keyCode == RIGHT){p.changeX = MOVE_SPEED;}
-  else if(keyCode == LEFT){p.changeX = -MOVE_SPEED;}
-  else if(keyCode == UP && isOnPlatforms(p, platforms)){p.changeY = -JUMP_SPEED;}
+  if(keyCode == RIGHT){player.changeX = MOVE_SPEED;}
+  else if(keyCode == LEFT){player.changeX = -MOVE_SPEED;}
+  else if(keyCode == UP && isOnPlatforms(player, platforms)){player.changeY = -JUMP_SPEED;}
   
 }
 
 void keyReleased(){
-  if(keyCode == RIGHT || keyCode == LEFT){p.changeX = 0;}
-  if(keyCode == UP){p.changeY = 0;}
+  if(keyCode == RIGHT || keyCode == LEFT){player.changeX = 0;}
+  if(keyCode == UP){player.changeY = 0;}
 }
 
 void createPlatforms(String filename){

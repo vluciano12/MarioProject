@@ -35,9 +35,9 @@ public class AnimatedSprite extends Sprite{
   // else if it is moving left, set direction to LEFT_FACING
   // otherwise set it to NEUTRAL_FACING
   public void selectDirection(){
-    if(change_x > 0)
-      dir = RIGHT_FACING; //<>//
-    else if(change_x < 0)
+    if(changeX > 0)
+      dir = RIGHT_FACING; //<>// //<>// //<>//
+    else if(changeX < 0)
       dir = LEFT_FACING;    
     else
       dir = NEUTRAL_FACING;  
