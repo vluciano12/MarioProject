@@ -21,6 +21,7 @@ Player player;
 PImage grass, crate, greenBrick, coin, spider, p;
 ArrayList<Sprite> platforms;
 ArrayList<Sprite> coins;
+ArrayList<Sprite> enemies;
 Enemy enemy;
 
 boolean isGameOver;
@@ -40,6 +41,7 @@ void setup(){
   numCoins = 0;
   platforms = new ArrayList<Sprite>();
   coins = new ArrayList<Sprite>();
+  enemies = new ArrayList<Sprite>();
   
   grass = loadImage("grass.png");
   greenBrick = loadImage("brick.png");
@@ -53,29 +55,37 @@ void draw(){
   
   displayAll();
   
-  player.updateAnimation();
-  resolvePlatCollisions(player, platforms);
-  enemy.update();
-  enemy.updateAnimation();
+  if(!isGameOver){
+    updateAll();
+    collectCoins();
+    checkDeath();
+    enemyKill();
+  }
+  
+  
   //collectCoins();
   //checkDeath();
 }
 
 void displayAll(){
+  background(255);
   for(Sprite s : platforms)
     s.display();
     
   for(Sprite c : coins){
     c.display();
-    ((AnimatedSprite)c).updateAnimation();
   }
-  player.display();
-  enemy.display();
+  for(Sprite e : enemies){
+    e.display();
+  }
   
-  background(255);
+  player.display();
+  
+  fill(255,0,0);
   textSize(32);
-  text("Coin:" + numCoins, viewX + 50, viewY + 50);
-  text("Lives:" + player.lives, viewX + 50, viewY + 100);
+  text("Coins: " + numCoins, viewX + 50, viewY + 50);
+  text("Lives: " + player.lives, viewX + 50, viewY + 100);
+  
   if(isGameOver){
     fill(0,0,255);
     text("GAME OVER!", viewX + width/2 - 100, viewY + height/2);
@@ -84,6 +94,58 @@ void displayAll(){
     else
       text("You win!", viewX + width/2 - 100, viewY + height/2 + 100);
     text("Press SPACE to restart!", viewX + width/2 - 100, viewY + height/2 + 100);
+  }
+}
+
+void updateAll(){
+  player.updateAnimation();
+  resolvePlatCollisions(player, platforms);
+  for(Sprite c : coins){
+    ((AnimatedSprite)c).updateAnimation();
+  }
+  for(Sprite e : enemies){
+    e.update();
+    ((AnimatedSprite)e).updateAnimation();
+  }
+  collectCoins();
+  checkDeath();
+  enemyKill();
+}
+
+void checkDeath(){
+  ArrayList<Sprite> colEnemy = checkCollisionList(player, enemies);
+  boolean fallCliff = player.getBottom() > GROUND_LEVEL;
+  if(colEnemy.size() > 0 && player.onPlatform || fallCliff){
+    player.lives--;
+    if(player.lives == 0) isGameOver = true;
+    else{
+      player.centerX = 100;
+      player.setBottom(GROUND_LEVEL);
+    }
+  }
+}
+
+void enemyKill(){
+  ArrayList<Sprite> colEnemy = checkCollisionList(player, enemies);
+  if(colEnemy.size() > 0 && !player.onPlatform){
+    for(Sprite e : colEnemy){
+      enemies.remove(e);
+      player.changeY = -JUMP_SPEED;
+    }
+  }
+  
+}
+
+void collectCoins(){
+  ArrayList<Sprite> coinList = checkCollisionList(player, coins);
+  if(coinList.size() > 0){
+     for(Sprite coin : coinList){
+       numCoins++;
+       coins.remove(coin);
+     }
+  }
+  if(coins.size() == 0){
+    isGameOver = true;
   }
 }
 
@@ -190,9 +252,10 @@ void createPlatforms(String filename){
       } else if(values[col].equals("4")){
         float bL = col * SPRITE_SIZE;
         float bR = bL + 4 * SPRITE_SIZE;
-        enemy = new Enemy(spider, 50/72.0, bL, bR);
-        enemy.centerX = SPRITE_SIZE/2 + col * SPRITE_SIZE;
-        enemy.centerY = SPRITE_SIZE/2 + row * SPRITE_SIZE;
+        Enemy e = new Enemy(spider, 50/72.0, bL, bR);
+        e.centerX = SPRITE_SIZE/2 + col * SPRITE_SIZE;
+        e.centerY = SPRITE_SIZE/2 + row * SPRITE_SIZE;
+        enemies.add(e);
       }
     }
   }
