@@ -89,11 +89,12 @@ void displayAll(){
   if(isGameOver){
     fill(0,0,255);
     text("GAME OVER!", viewX + width/2 - 100, viewY + height/2);
-    if(player.lives == 0)
+    if(player.lives <= 0){
       text("You lose!", viewX + width/2 - 100, viewY + height/2 + 50);
-    else
+    } else {
       text("You win!", viewX + width/2 - 100, viewY + height/2 + 100);
-    text("Press SPACE to restart!", viewX + width/2 - 100, viewY + height/2 + 100);
+    }
+    text("Press SPACE to restart!", viewX + width/2 - 100, viewY + height/2 + 150);
   }
 }
 
@@ -221,6 +222,7 @@ void keyPressed(){
   if(keyCode == RIGHT){player.changeX = MOVE_SPEED;}
   else if(keyCode == LEFT){player.changeX = -MOVE_SPEED;}
   else if(keyCode == UP && isOnPlatforms(player, platforms)){player.changeY = -JUMP_SPEED;}
+  else if(isGameOver && key == ' ' || key == 'r') setup();
   
 }
 
